@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>School Admission Information Day</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+		*{
+			box-sizing: border-box;
+		}
+		
+	html, body {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		position: relative;
+	}
+
+	.bg-image {
+		background-image: url("hpccss.jpeg");
+		filter: blur(8px);
+		-webkit-filter: blur(8px);
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+		
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: -1;}
+
+		body {
+			font-family: 'Poppins', sans-serif;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 1rem;
+		}
+		
+		.quiz-container {
+			background: white;
+			border-radius: 1.5rem;
+			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+			overflow: hidden;
+			width: 100%;
+			max-width: 800px;
+		}
+		
+		.quiz-header {
+			background: linear-gradient(135deg, #6366f1, #8b5cf6);
+			color: white;
+			padding: 2rem;
+			text-align: center;
+		}
+		
+		.question-container {
+			padding: 2.5rem;
+			background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+		}
+		
+		.question-text {
+			font-size: 1.875rem;
+			font-weight: 700;
+			color: #1f2937;
+			text-align: center;
+			margin-bottom: 2.5rem;
+		}
+		
+		.options-grid {
+			display: grid;
+			gap: 1.25rem;
+		}
+		
+		.option-card {
+			padding: 1.5rem;
+			border-radius: 1rem;
+			color: white;
+			font-weight: 600;
+			font-size: 1.25rem;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			display: flex;
+			align-items: center;
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		}
+		
+		.option-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+		}
+		
+		.option-letter {
+			width: 2.5rem;
+			height: 2.5rem;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.3);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 700;
+			margin-right: 1rem;
+			font-size: 1.125rem;
+			flex-shrink: 0;
+			flex-grow: 0;
+		}
+		
+		.correct {
+			background: linear-gradient(135deg, #10b981, #059669);
+			animation: pulse 0.5s ease-in-out;
+		}
+		
+		.incorrect {
+			background: linear-gradient(135deg, #ef4444, #dc2626);
+		}
+		
+		.result-modal {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.7);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 100;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.3s ease;
+		}
+		
+		.result-modal.visible {
+			opacity: 1;
+			pointer-events: all;
+		}
+		
+		.modal-content {
+			background: white;
+			border-radius: 1.5rem;
+			padding: 2rem;
+			max-width: 90%;
+			width: 400px;
+			text-align: center;
+			transform: scale(0.9);
+			transition: transform 0.3s ease;
+		}
+		
+		.result-modal.visible .modal-content {
+			transform: scale(1);
+		}
+		
+		.result-icon {
+			font-size: 4rem;
+			margin-bottom: 1rem;
+		}
+		
+		.result-title {
+			font-size: 1.5rem;
+			font-weight: 700;
+			margin-bottom: 0.5rem;
+			color: #1f2937;
+		}
+		
+		.result-message {
+			color: #6b7280;
+			margin-bottom: 1.5rem;
+		}
+		
+		.play-again-btn {
+			background: linear-gradient(135deg, #6366f1, #8b5cf6);
+			color: white;
+			border: none;
+			padding: 0.75rem 1.5rem;
+			border-radius: 0.75rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+		
+		.play-again-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+		}
+		
+		@keyframes pulse {
+			0% { transform: scale(1); }
+			50% { transform: scale(1.05); }
+			100% { transform: scale(1); }
+		}
+		
+		@media (max-width: 768px) {
+			.question-text {
+				font-size: 1.5rem;
+			}
+			
+			.option-card {
+				padding: 1.25rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="bg-image"></div>
+	<div class="quiz-container">
+		<div class="quiz-header">
+			<h1 class="text-3xl font-bold">School Admission Information Day!</h1>
+		</div>
+		
+		<div class="question-container">
+			<div class="question-text" id="questionText"></div>
+			
+			<div class="options-grid" id="optionsContainer">
+				<!-- Options will be dynamically inserted here -->
+			</div>
+		</div>
+	</div>
+	
+	<div class="result-modal" id="resultModal">
+		<div class="modal-content">
+			<div class="result-icon" id="resultIcon">🎉</div>
+			<h3 class="result-title" id="resultTitle">Correct!</h3>
+			<p class="result-message" id="resultMessage"></p>
+			<button class="play-again-btn" id="nextQuestion">Next Question</button>
+			<button class="play-again-btn" id="tryAgainQuestion">Try Again</button>
+		</div>
+	</div>
+
+	<script>
+		// Quiz data - easily customizable
+		const quizData = {
+			title: "Unity Questions",
+			questions: [
+			{
+				number: 4,
+				question: "The class is making a poster. Everyone draws their own part separately, then puts it all together. What does this show?\n班上要做海報，大家分開畫，各自完成的部分最後貼在一起。這顯示什麼？",
+				options: [
+					{ text: "Everyone hides their work\n每個人都藏起來", correct: false },
+					{ text: "Unity in sharing ideas\n團結分享想法", correct: true },
+					{ text: "Only listening to the teacher\n只聽老師的話", correct: false },
+					{ text: "Not drawing at all\n不畫畫", correct: false }
+				]
+			},
+			{
+				number: 4,
+				question: "In a soccer game, teammates don’t pass the ball and just kick it themselves, so they lose. Why?\n足球比賽中，隊友不傳球只自己踢，結果輸了。為什麼？",
+				options: [
+					{ text: "The ball is too heavy\n球太重", correct: false },
+					{ text: "Lack of unity\n缺少團結", correct: true },
+					{ text: "Bad weather\n天氣不好", correct: false },
+					{ text: "Opponents are too strong\n對手太強", correct: false }
+				]
+			},
+			{
+				number: 5,
+				question: "Lily’s toy breaks, and Jack and Mia help fix it together. Is this an example of unity?\n小花的玩具壞了，小強和小美一起幫忙修好。這是團結的例子嗎？",
+				options: [
+					{ text: "No, they’re just playing\n不是，他們在玩", correct: false },
+					{ text: "Yes, solving problems together\n是，一起解決問題", correct: true },
+					{ text: "No, just watching without helping\n不是，只看不動手", correct: false },
+					{ text: "Yes, but one person fixes it better\n是，但一個人修更好", correct: false }
+				]
+			},
+			{
+				number: 6,
+				question: "What is a benefit of unity?\n團結的好處是什麼？",
+				options: [
+					{ text: "Feeling more lonely\n變得更孤單", correct: false },
+					{ text: "Getting things done faster and better\n事情做得更快更好", correct: true },
+					{ text: "Spending more money\n花更多錢", correct: false },
+					{ text: "Always losing\n總是輸", correct: false }
+				]
+			},
+			{
+				number: 7,
+				question: "If a classmate falls down, what should you do?\n如果同學跌倒了，你該怎麼做？",
+				options: [
+					{ text: "Laugh at them\n笑他", correct: false },
+					{ text: "Walk away alone\n一個人走開", correct: false },
+					{ text: "Help them up and walk together\n扶他起來，一起走", correct: true },
+					{ text: "Tell the teacher but not help\n告訴老師不幫忙", correct: false }
+				]
+			},
+			{
+				number: 8,
+				question: "The class is singing a song, and Jake is shy to sing. Everyone encourages him and practices together. What is this?\n班上要唱歌，小傑害羞不敢唱，大家鼓勵他一起練習。這是？",
+				options: [
+					{ text: "Bullying him\n欺負他", correct: false },
+					{ text: "Unity in support\n團結支持", correct: true },
+					{ text: "One person sings better alone\n一個人唱更好", correct: false },
+					{ text: "No practice\n不練習", correct: false }
+				]
+			},
+			{
+				number: 9,
+				question: "Building a sandcastle: One person piles it up, and it collapses quickly. Three people build it together, and it’s tall and strong. What does this show?\n一個人疊沙堡很快就塌了，三個人一起疊就很高大。這說明什麼？",
+				options: [
+					{ text: "One person is smarter\n一個人聰明", correct: false },
+					{ text: "Unity makes things more stable\n團結讓東西更穩固", correct: true },
+					{ text: "The sand is too wet\n沙子太濕", correct: false },
+					{ text: "Better not to build\n不建更好", correct: false }
+				]
+			},
+			{
+				number: 10,
+				question: "In what situation do you not need unity?\n什麼情況下不需要團結？",
+				options: [
+					{ text: "Brushing your teeth\n刷牙", correct: true },
+					{ text: "Team relay race\n團隊賽跑", correct: false },
+					{ text: "Family picnic\n家庭野餐", correct: false },
+					{ text: "School performance\n學校表演", correct: false }
+				]
+			},
+			{
+				number: 11,
+				question: "Animal story: A turtle tries to cross a river alone but can’t swim across. Rabbit and fox build a bridge to help. What does this teach us?\n小烏龜過河，游不過去，兔子和狐狸幫忙搭橋。這告訴我們什麼？",
+				options: [
+					{ text: "Animals don’t unite\n動物不團結", correct: false },
+					{ text: "Unity overcomes difficulties\n團結克服困難", correct: true },
+					{ text: "The turtle is too slow\n烏龜太慢", correct: false },
+					{ text: "The river is too wide\n河太寬", correct: false }
+				]
+			},
+			{
+				number: 12,
+				question: "What should everyone do during unity?\n團結時，大家該怎麼做？",
+				options: [
+					{ text: "Grab things from each other\n互相搶東西", correct: false },
+					{ text: "Share ideas and listen to others\n分享意見和聽別人", correct: true },
+					{ text: "Only talk about yourself\n只自己說話", correct: false },
+					{ text: "Skip the meeting\n不來開會", correct: false }
+				]
+			},
+			{
+				number: 13,
+				question: "If the team has different opinions, what to do?\n如果團隊意見不同，怎麼辦？",
+				options: [
+					{ text: "Fight\n打架", correct: false },
+					{ text: "Discuss together and find the best way\n一起討論，找最好辦法", correct: true },
+					{ text: "One person decides everything\n一個人決定", correct: false },
+					{ text: "Do nothing\n都不做", correct: false }
+				]
+			},
+			{
+				number: 14,
+				question: "Family cooking: Dad chops vegetables, Mom cooks soup, Tim sets the table. Is this unity?\n家庭做飯：爸爸切菜，媽媽煮湯，小明擺碗。這是團結嗎？",
+				options: [
+					{ text: "No, it’s a mess\n不是，亂七八糟", correct: false },
+					{ text: "Yes, dividing tasks and cooperating\n是，分工合作", correct: true },
+					{ text: "No, one person cooking is better\n不是，一個人煮更好", correct: false },
+					{ text: "Yes, but not eating together\n是，但吃飯時不一起", correct: false }
+				]
+			},
+			{
+				number: 15,
+				question: "School cleaning: If no one helps and only one person sweeps, it doesn’t finish. Why?\n學校清掃大家不幫忙，一個人掃不完。為什麼？",
+				options: [
+					{ text: "The broom is broken\n掃帚壞了", correct: false },
+					{ text: "Lack of unity—everyone not joining in\n缺少團結，大家不一起", correct: true },
+					{ text: "The floor is too dirty\n地板太髒", correct: false },
+					{ text: "Too much time\n時間太多", correct: false }
+				]
+			},
+			{
+				number: 16,
+				question: "What is a symbol of unity?\n團結的象徵是什麼？",
+				options: [
+					{ text: "One chopstick\n一根筷子", correct: false },
+					{ text: "A bundle of chopsticks tied together—hard to break\n一把筷子綁在一起，很難斷", correct: true },
+					{ text: "Scattered toys\n散開的玩具", correct: false },
+					{ text: "A single candle\n單獨的蠟燭", correct: false }
+				]
+			},
+			{
+				number: 17,
+				question: "What can elementary students learn from unity?\n小學生團結可以學到什麼？",
+				options: [
+					{ text: "Only play games\n只玩遊戲", correct: false },
+					{ text: "Learn from each other and get better\n互相學習，變得更好", correct: true },
+					{ text: "Always get zero on tests\n總是考零分", correct: false },
+					{ text: "No friends\n不交朋友", correct: false }
+				]
+			},
+			{
+				number: 18,
+				question: "At the park slide, everyone lines up and takes turns without pushing. What is this?\n公園玩滑梯，大家排隊不推擠。這是什麼？",
+				options: [
+					{ text: "Messy play\n亂玩", correct: false },
+					{ text: "Unity in following rules\n團結遵守規則", correct: true },
+					{ text: "One person sliding is best\n一個人滑最好", correct: false },
+					{ text: "No sliding\n不玩滑梯", correct: false }
+				]
+			},
+			{
+				number: 19,
+				question: "If the team wins the game, how should they celebrate?\n如果團隊贏了比賽，大家該怎麼慶祝？",
+				options: [
+					{ text: "Only one person happy\n只一個人高興", correct: false },
+					{ text: "Clap and hug together\n一起拍手擁抱", correct: true },
+					{ text: "Blame each other\n互相指責", correct: false },
+					{ text: "Go home to sleep\n回家睡覺", correct: false }
+				]
+			}
+		]
+	};
+
+		// Colors for the option cards
+		const optionColors = ["#B944EF", "#3b82f6", "#eab308", "#22c55e", "#8b5cf6", "#ec4899"];
+		const optionLetters = ["A", "B", "C", "D", "E", "F"];
+
+		let answered = false;
+		let usedQuestions = new Set();
+
+		function initializeQuiz() {
+			// Load a random question
+			loadRandomQuestion();
+		}
+
+		function getRandomQuestion() {
+			// Get all available questions (not used yet)
+			const availableQuestions = quizData.questions.filter((_, index) => !usedQuestions.has(index));
+			
+			// If all questions have been used, reset the used questions set
+			if (availableQuestions.length === 0) {
+				usedQuestions.clear();
+				return quizData.questions[Math.floor(Math.random() * quizData.questions.length)];
+			}
+			
+			// Get a random question from available ones
+			const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+			const question = availableQuestions[randomIndex];
+			
+			// Find the original index to mark it as used
+			const originalIndex = quizData.questions.indexOf(question);
+			usedQuestions.add(originalIndex);
+			
+			return question;
+		}
+
+		function loadRandomQuestion() {
+			answered = false;
+			const question = getRandomQuestion();
+			
+			// Set the question text
+			document.getElementById('questionText').textContent = question.question;
+			
+			// Get the options container
+			const optionsContainer = document.getElementById('optionsContainer');
+			optionsContainer.innerHTML = '';
+			
+			// Determine grid layout based on number of options
+			const optionCount = question.options.length;
+			if (optionCount <= 2) {
+				optionsContainer.style.gridTemplateColumns = '1fr';
+			} else if (optionCount <= 4) {
+				optionsContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+			} else {
+				optionsContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
+			}
+			
+			// Create the option cards based on the dataset
+			question.options.forEach((option, index) => {
+				const optionCard = document.createElement('div');
+				optionCard.className = `option-card`;
+				optionCard.style.backgroundColor = optionColors[index % optionColors.length];
+				optionCard.setAttribute('data-correct', option.correct);
+				
+				const optionLetter = document.createElement('div');
+				optionLetter.className = 'option-letter';
+				optionLetter.textContent = optionLetters[index];
+				
+				const optionText = document.createElement('span');
+				optionText.textContent = option.text;
+				
+				optionCard.appendChild(optionLetter);
+				optionCard.appendChild(optionText);
+				
+				optionsContainer.appendChild(optionCard);
+			});
+			
+			// Reattach event listeners
+			attachOptionListeners();
+		}
+
+		function attachOptionListeners() {
+			const options = document.querySelectorAll('.option-card');
+			const resultModal = document.getElementById('resultModal');
+			const resultTitle = document.getElementById('resultTitle');
+			const resultMessage = document.getElementById('resultMessage');
+			const resultIcon = document.getElementById('resultIcon');
+			const nextButton = document.getElementById('nextQuestion');
+			const tryAgain = document.getElementById("tryAgainQuestion");
+
+			options.forEach(option => {
+				option.addEventListener('click', function() {
+					if (answered) return;
+					//answered = true;
+
+					const isCorrect = this.getAttribute('data-correct') === 'true';
+					const currentQuestion = Array.from(options).find(opt => opt.getAttribute('data-correct') === 'true');
+					const correctAnswer = currentQuestion.querySelector('span').textContent;
+
+					if (isCorrect) {
+						this.classList.add('correct');
+						showResultModal(true, correctAnswer);
+					} else {
+						this.classList.add('incorrect');
+						currentQuestion.classList.add('correct');
+						showResultModal(false, correctAnswer);
+					}
+/*
+					options.forEach(opt => {
+						opt.style.pointerEvents = 'none';
+					});*/
+
+					resultModal.classList.add('visible');
+				});
+			});
+
+			nextButton.addEventListener('click', function() {
+				resultModal.classList.remove('visible');
+				loadRandomQuestion();
+			});
+			
+			tryAgainQuestion.addEventListener('click', function() {
+				resultModal.classList.remove('visible');
+			});
+			
+			function showResultModal(isCorrect, correctAnswer) {
+				if (isCorrect) {
+					resultTitle.textContent = 'Correct!';
+					resultMessage.textContent = `Well done! ${correctAnswer} is the correct answer.`;
+					resultIcon.textContent = '🎉';
+					tryAgain.style = "display: none"
+					nextQuestion.style = "display: initial"
+				} else {
+					resultTitle.textContent = 'Incorrect!';
+					resultMessage.textContent = ``;
+					resultIcon.textContent = '😢';
+					tryAgain.style = "display: initial"
+					nextQuestion.style = "display: none"
+				}
+			}
+		}
+
+		// Initialize the quiz when the page loads
+		document.addEventListener('DOMContentLoaded', initializeQuiz);
+	</script>
+</body>
+</html>
