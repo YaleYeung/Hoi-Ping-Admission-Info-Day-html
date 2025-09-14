@@ -440,19 +440,32 @@
 			return question;
 		}
 
+		// Shuffle
+		function shuffleArray(array) {
+			const arr = array.slice(); // copy Array preventing from changing the original one
+			for (let i = arr.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[arr[i], arr[j]] = [arr[j], arr[i]];
+			}
+			return arr;
+		}
+		
 		function loadRandomQuestion() {
 			answered = false;
 			const question = getRandomQuestion();
-			
-			// Set the question text
+		
+			// Shuffle
+			const shuffledOptions = shuffleArray(question.options);
+		
+			// Set question
 			document.getElementById('questionText').textContent = question.question;
-			
-			// Get the options container
+		
+			// Reselection
 			const optionsContainer = document.getElementById('optionsContainer');
 			optionsContainer.innerHTML = '';
-			
-			// Determine grid layout based on number of options
-			const optionCount = question.options.length;
+		
+			// Adjustin according to MC choices
+			const optionCount = shuffledOptions.length;
 			if (optionCount <= 2) {
 				optionsContainer.style.gridTemplateColumns = '1fr';
 			} else if (optionCount <= 4) {
@@ -460,28 +473,28 @@
 			} else {
 				optionsContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
 			}
-			
-			// Create the option cards based on the dataset
-			question.options.forEach((option, index) => {
+		
+			// randoming auestions
+			shuffledOptions.forEach((option, index) => {
 				const optionCard = document.createElement('div');
 				optionCard.className = `option-card`;
 				optionCard.style.backgroundColor = optionColors[index % optionColors.length];
 				optionCard.setAttribute('data-correct', option.correct);
-				
+		
 				const optionLetter = document.createElement('div');
 				optionLetter.className = 'option-letter';
 				optionLetter.textContent = optionLetters[index];
-				
+		
 				const optionText = document.createElement('span');
 				optionText.textContent = option.text;
-				
+		
 				optionCard.appendChild(optionLetter);
 				optionCard.appendChild(optionText);
-				
+		
 				optionsContainer.appendChild(optionCard);
 			});
-			
-			// Reattach event listeners
+		
+			// reattach listeners
 			attachOptionListeners();
 		}
 
