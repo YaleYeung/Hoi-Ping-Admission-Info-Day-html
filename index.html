@@ -186,6 +186,36 @@
 			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 		}
 		
+		.progress-container {
+			position: relative;
+			height: 8px;
+			border-radius: 4px;
+			background-color: #9ca3af; /* Tailwind gray-400 */
+			overflow: hidden;
+			margin-top: 1rem;
+		}
+		
+		.progress-bar {
+			height: 100%;
+			background: white;
+			border-radius: 4px 0 0 4px;
+			transition: width 0.3s ease;
+			position: relative;
+			z-index: 2;
+		}
+		
+		#progressBarBackground {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+			background-color: white; /* Tailwind gray-400 */
+			opacity: 0.2;
+			border-radius: 4px;
+			z-index: 1;
+		}
+		
 		@keyframes pulse {
 			0% { transform: scale(1); }
 			50% { transform: scale(1.05); }
@@ -208,6 +238,11 @@
 	<div class="quiz-container">
 		<div class="quiz-header">
 			<h1 class="text-3xl font-bold">School Admission Information Day!</h1>
+			<div class="progress-container mt-4">
+				<div class="progress-bar bg-white rounded h-2" id="progressBar" style="width: 0%;"></div>
+				<div class="progress-bar bg-grey rounded h-2" id="progressBarBackground" style="width: 100%;"></div>
+			</div>
+			<div class="text-white mt-2 font-semibold" id="progressText">0 / 0</div>
 		</div>
 		
 		<div class="question-container">
@@ -230,6 +265,19 @@
 	</div>
 
 	<script>
+		var playedQuestions = 0
+		const targetQuestions = 3
+		var wrongs = 0
+		var lastCor = ""
+		
+		function updateProgress() {
+			const progressBar = document.getElementById('progressBar');
+			const progressText = document.getElementById('progressText');
+			const progressPercent = (playedQuestions / targetQuestions) * 100;
+			progressBar.style.width = `${progressPercent}%`;
+			progressText.textContent = `${playedQuestions} / ${targetQuestions}`;
+		}
+		
 		// Quiz data - easily customizable
 		const quizData = {
 			title: "Unity Questions",
@@ -416,6 +464,7 @@
 
 		function initializeQuiz() {
 			// Load a random question
+			updateProgress();
 			loadRandomQuestion();
 		}
 
@@ -451,7 +500,7 @@
 		}
 		
 		function loadRandomQuestion() {
-			answered = false;
+			updateProgress();
 			const question = getRandomQuestion();
 		
 			// Shuffle
@@ -524,10 +573,7 @@
 						currentQuestion.classList.add('correct');
 						showResultModal(false, correctAnswer);
 					}
-/*
-					options.forEach(opt => {
-						opt.style.pointerEvents = 'none';
-					});*/
+
 
 					resultModal.classList.add('visible');
 				});
@@ -544,19 +590,44 @@
 			
 			function showResultModal(isCorrect, correctAnswer) {
 				if (isCorrect) {
-					resultTitle.textContent = 'Correct!';
-					resultMessage.textContent = `Well done! ${correctAnswer} is the correct answer.`;
+					resultTitle.textContent = 'Correct 正確!';
+					resultMessage.textContent = `Well done! This is the correct answer. \n 做得好！你答對了！`;
 					resultIcon.textContent = '🎉';
 					tryAgain.style = "display: none"
 					nextQuestion.style = "display: initial"
+					playedQuestions ++
+					if (playedQuestions == targetQuestions + 1){
+						if (wrongs != 0){
+							wrongs --
+						}
+						resultMessage.textContent = 'Congrats! 恭喜!';
+						resultMessage.innerHTML = `All done! 你已經答對全部問題! <br> <strong>STATS: ${targetQuestions - wrongs + 1} Ball(s) should be given</strong>`;
+						wrongs = 0;
+						lastCor = "";
+						playedQuestions = 0;
+						nextQuestion.style = "display: none"
+						setTimeout(() => {
+							const listener = document.addEventListener('click', restartQuiz);
+						}, 1000)
+					}
 				} else {
-					resultTitle.textContent = 'Incorrect!';
-					resultMessage.textContent = ``;
+					resultTitle.textContent = 'Incorrect! 不太正確';
+					resultMessage.textContent = `Keep trying! 差一點，繼續嘗試！`;
 					resultIcon.textContent = '😢';
 					tryAgain.style = "display: initial"
 					nextQuestion.style = "display: none"
+					if (lastCor != correctAnswer){
+						lastCor = correctAnswer
+						wrongs ++
+					}
 				}
 			}
+		}
+		
+		function restartQuiz(){
+			resultModal.classList.remove('visible');
+			document.removeEventListener("click", restartQuiz)
+			initializeQuiz();
 		}
 
 		// Initialize the quiz when the page loads
