@@ -266,7 +266,7 @@
 
 	<script>
 		var playedQuestions = 0
-		const targetQuestions = 3
+		const targetQuestions = 2
 		var wrongs = 0
 		var lastCor = ""
 		
@@ -601,7 +601,7 @@
 							wrongs --
 						}
 						resultMessage.textContent = 'Congrats! 恭喜!';
-						resultMessage.innerHTML = `All done! 你已經答對全部問題! <br> <strong>STATS: ${targetQuestions - wrongs + 1} Ball(s) should be given</strong>`;
+						resultMessage.innerHTML = `All done! 你已經答對全部問題!`;
 						wrongs = 0;
 						lastCor = "";
 						playedQuestions = 0;
